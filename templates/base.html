@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>title</title>
+    <link rel="stylesheet" href="static/bootstrap.min.css"/>
+</head>
+<body>
+{% if current_user.is_authenticated() %}
+    Hi {{ current_user.email }}!
+    <p>Click <a href="/logout">here</a> to logout.</p>
+{% endif %}
+
+<div class="container"></div>
+
+{% block content %}{% endblock %}
+
+<br>
+{% for message in get_flashed_messages() %}
+  {{ message }}
+{% endfor %}
+
+</body>
+</html>
