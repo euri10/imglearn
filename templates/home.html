@@ -1,5 +1,24 @@
 {%extends 'base.html' %}
 {% block content %}
 <h1>Welcome home</h1>
-
+<table class="table table-hover">
+   <thead>
+      <tr>
+         <th>Bot Name</th>
+         <th>Bot Description</th>
+         <th>Action</th>
+      </tr>
+   </thead>
+   <tbody>
+   {% for bot in bots %}
+    <tr>
+    <td>{{ bot.name }}</td>
+    <td>{{ bot.description }}</td>
+    <td>560001</td>
+    </tr>
+   {% endfor %}
+   
+      
+   </tbody>
+</table>
 {% endblock %}
