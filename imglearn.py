@@ -4,6 +4,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String
 from wtforms import StringField, Form, validators, PasswordField
 from flask.ext.bcrypt import Bcrypt
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///botdb.db'
@@ -12,6 +13,33 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 bcrypt = Bcrypt(app)
+
+
+class BotAddForm(Form):
+    name = StringField('Bot Name', [validators.DataRequired()])
+    description = StringField('Bot Description', [validators.DataRequired()])
+
+
+def get_bot_id():
+
+    return Bot.query.all()
+
+
+class BotDeleteForm(Form):
+    id = QuerySelectField('Bot ID', query_factory=get_bot_id)
+
+class RegisterForm(Form):
+    email = StringField('Email address', [validators.DataRequired(), validators.Email()])
+    password = PasswordField('Password', [validators.DataRequired(),
+                                          validators.EqualTo('confirm', message='Please repeat password'),
+                                          validators.Length(min=6, max=100)])
+    confirm = PasswordField('Repeat password')
+
+
+class LoginForm(Form):
+    email = StringField('Email address', [validators.DataRequired(), validators.Email()])
+    password = PasswordField('Password', [validators.DataRequired()])
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -35,6 +63,17 @@ class User(db.Model):
     def get_id(self):
         return unicode(self.id)
 
+
+class Bot(db.Model):
+    __tablename__ = 'bots'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True)
+    description = Column(String)
+
+    #used for QuerySelectField
+    def __str__(self):
+        return self.name
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter(User.id == int(user_id)).first()
@@ -46,29 +85,35 @@ def welcome():
     return render_template('welcome.html')
 
 
-class Bot(db.Model):
-    __tablename__ = 'bots'
-    id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True)
-    description = Column(String)
-
-
-class BotFormAdd(Form):
-    pass
-
-
 @app.route('/home', methods=['GET', 'POST'])
 @login_required
 def home():
     bots = Bot.query.all()
-    form = BotFormAdd(request.form)
-    
-    return render_template('home.html', bots=bots, form=form)
+    formadd = BotAddForm(request.form)
+    formdel = BotDeleteForm(request.form)
+    return render_template('home.html', bots=bots, formadd=formadd, formdel=formdel)
 
 
-class LoginForm(Form):
-    email = StringField('Email address', [validators.DataRequired(), validators.Email()])
-    password = PasswordField('Password', [validators.DataRequired()])
+
+
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    formdel = BotDeleteForm(request.form)
+    if request.method == 'POST' and formdel.validate():
+        db.session.delete(formdel.id.data)
+        db.session.commit()
+        return redirect(url_for('home'))
+
+
+@app.route('/add', methods=['POST'])
+def add():
+    formadd = BotAddForm(request.form)
+    if request.method == 'POST' and formadd.validate():
+        bot = Bot(name=formadd.name.data, description=formadd.description.data)
+        db.session.add(bot)
+        db.session.commit()
+        return redirect(url_for('home'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -79,20 +124,12 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash('You were logged in. Go Crazy.')
+            flash('You just logged in.')
             return redirect(url_for('home'))
         else:
             flash('Invalid username or password.')
 
     return render_template('login.html', form=form, error=error)
-
-
-class RegisterForm(Form):
-    email = StringField('Email address', [validators.DataRequired(), validators.Email()])
-    password = PasswordField('Password', [validators.DataRequired(),
-                                          validators.EqualTo('confirm', message='Please repeat password'),
-                                          validators.Length(min=6, max=100)])
-    confirm = PasswordField('Repeat password')
 
 
 @app.route('/register', methods=['GET', 'POST'])
