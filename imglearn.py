@@ -94,9 +94,6 @@ def home():
     return render_template('home.html', bots=bots, formadd=formadd, formdel=formdel)
 
 
-
-
-
 @app.route('/delete', methods=['POST'])
 def delete():
     formdel = BotDeleteForm(request.form)
