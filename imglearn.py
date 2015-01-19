@@ -21,12 +21,12 @@ class BotAddForm(Form):
 
 
 def get_bot_id():
-
     return Bot.query.all()
 
 
 class BotDeleteForm(Form):
     id = QuerySelectField('Bot ID', query_factory=get_bot_id)
+
 
 class RegisterForm(Form):
     email = StringField('Email address', [validators.DataRequired(), validators.Email()])
@@ -63,6 +63,11 @@ class User(db.Model):
     def get_id(self):
         return unicode(self.id)
 
+    @classmethod
+    def get_session():
+        # this method should return sqlalchemy session
+        return db.session
+
 
 class Bot(db.Model):
     __tablename__ = 'bots'
@@ -70,9 +75,10 @@ class Bot(db.Model):
     name = Column(String, unique=True)
     description = Column(String)
 
-    #used for QuerySelectField
+    # used for QuerySelectField
     def __str__(self):
         return self.name
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -110,7 +116,9 @@ def add():
         bot = Bot(name=formadd.name.data, description=formadd.description.data)
         db.session.add(bot)
         db.session.commit()
-        return redirect(url_for('home'))
+    else:
+        flash('All fields must be filled')
+    return redirect(url_for('home'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -135,10 +143,14 @@ def register():
     form = RegisterForm(request.form)
     if request.method == 'POST' and form.validate():
         user = User(email=form.email.data, password=form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Thanks for registering')
-        return redirect(url_for('login'))
+        print(User.query.filter(User.email == form.email.data).first())
+        if User.query.filter(User.email == form.email.data).first() is None:
+            db.session.add(user)
+            db.session.commit()
+            flash('Thanks for registering')
+            return redirect(url_for('login'))
+        else:
+            flash('user already exists'+ user.__str__())
     else:
         error = 'Please make sure you enter a real email and passwords match'
     return render_template('register.html', form=form, error=error)

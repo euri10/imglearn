@@ -4,20 +4,16 @@
 
 
 {% from "_formhelpers.html" import render_field %}
-<form role="form" method=post action="{{ url_for('add') }}">
+<form class="form-inline" role="form" method=post action="{{ url_for('add') }}">
 {{ render_field(formadd.name) }}
 {{ render_field(formadd.description) }}
 <p><input type=submit class="btn btn-success" value=Add Bot>
 </form>
 
-<form role="form" method=post action="{{ url_for('delete') }}">
+<form class="form-inline" role="form" method=post action="{{ url_for('delete') }}">
 {{ render_field(formdel.id) }}
 <p><input type=submit class="btn btn-warning" value=Delete Bot>
 </form>
-
-
-
-
 
 <table class="table table-hover">
    <thead>

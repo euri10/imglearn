@@ -2,23 +2,26 @@
 <html xmlns="http://www.w3.org/1999/html">
 <head lang="en">
     <meta charset="UTF-8">
-    <title>title</title>
+    <title>Imglearn bot tool</title>
     <link rel="stylesheet" href="static/bootstrap.min.css"/>
 </head>
 <body>
+
+{% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+  {{ message }}
+    </div>
+{% endfor %}
+
 {% if current_user.is_authenticated() %}
     Hi {{ current_user.email }}!
     <p>Click <a href="/logout">here</a> to logout.</p>
 {% endif %}
 
-<div class="container"></div>
-
+<div class="container">
 {% block content %}{% endblock %}
-
+</div>
 <br>
-{% for message in get_flashed_messages() %}
-  {{ message }}
-{% endfor %}
 
 </body>
 </html>
