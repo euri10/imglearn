@@ -106,6 +106,7 @@ crashlytics.properties
 crashlytics-build.properties
 
 botdb.db
+client_secret.json
 
 
 

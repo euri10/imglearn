@@ -150,7 +150,7 @@ def register():
             flash('Thanks for registering')
             return redirect(url_for('login'))
         else:
-            flash('user already exists'+ user.__str__())
+            flash('user already exists ' + user.email)
     else:
         error = 'Please make sure you enter a real email and passwords match'
     return render_template('register.html', form=form, error=error)
