@@ -1,0 +1,10 @@
+[proxy_settings]
+proxyurl =
+username =
+password =
+
+requests_proxy =
+
+[google]
+developperkey =
+cx =
