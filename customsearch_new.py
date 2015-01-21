@@ -24,6 +24,9 @@ def search_google(search):
     res = service.cse().list(q=search, cx=cx, searchType='image').execute()
     return [l['link'] for l in res['items']]
 
+def search_duckduckgo(search)
+
+
 # with open('data.txt', 'w') as outfile:
 #     json.dump(res, outfile)
 #
@@ -35,11 +38,8 @@ def search_google(search):
 # links = [l['link'] for l in d['items']]
 # pprint.pprint(links)
 
-
-proxies = {"http": proxyurl, }
-
-
 def save_images_from_link(links):
+    proxies = {"http": proxyurl, }
     for link in links:
         page = requests.get(link, proxies=proxies)
         scheme, netloc, path, query, fragment = urlsplit(link)

@@ -2,7 +2,6 @@
 proxyurl =
 username =
 password =
-
 requests_proxy =
 
 [google]
