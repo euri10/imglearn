@@ -4,6 +4,10 @@ username =
 password =
 requests_proxy =
 
+# developper key here :
+# https://console.developers.google.com/project/PROJECT-NAME/apiui/credential?authuser=0
+# cx here :
+# https://www.google.com/cse/all
 [google]
 developperkey =
 cx =
